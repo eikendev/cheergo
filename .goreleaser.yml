@@ -1,0 +1,16 @@
+builds:
+  - id: cheergo
+    main: ./cmd/cheergo
+    goos:
+      - linux
+    goarch:
+      - amd64
+
+checksum:
+  algorithm: sha256
+
+archives:
+  - id: cheergo
+    builds:
+      - cheergo
+    format: tar.gz
