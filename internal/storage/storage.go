@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/google/go-github/v37/github"
@@ -13,7 +12,7 @@ type Store struct {
 }
 
 func Read(path string) (*Store, error) {
-	yfile, err := ioutil.ReadFile(path)
+	yfile, err := os.ReadFile(path)
 	if os.IsNotExist(err) {
 		yfile = []byte{}
 	} else if err != nil {
@@ -40,7 +39,7 @@ func Write(path string, store *Store) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(path, out, 0644)
+	err = os.WriteFile(path, out, 0o644)
 	if err != nil {
 		return err
 	}
