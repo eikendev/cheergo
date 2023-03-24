@@ -14,9 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var (
-	opts = options.Options{}
-)
+var opts = options.Options{}
 
 func init() {
 	log.SetFormatter(&log.TextFormatter{
