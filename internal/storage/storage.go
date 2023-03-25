@@ -12,7 +12,7 @@ type Store struct {
 }
 
 func Read(path string) (*Store, error) {
-	yfile, err := os.ReadFile(path)
+	yfile, err := os.ReadFile(path) //#nosec G304
 	if os.IsNotExist(err) {
 		yfile = []byte{}
 	} else if err != nil {
@@ -39,7 +39,7 @@ func Write(path string, store *Store) error {
 		return err
 	}
 
-	err = os.WriteFile(path, out, 0o644)
+	err = os.WriteFile(path, out, 0o600)
 	if err != nil {
 		return err
 	}
