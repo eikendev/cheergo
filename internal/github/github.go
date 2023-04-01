@@ -1,3 +1,4 @@
+// Package github provides functionality related to a GitHub account.
 package github
 
 import (
@@ -7,8 +8,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetRepositories returns a list of repositories from a given user.
 func GetRepositories(user string) ([]*github.Repository, error) {
-	all_repos := []*github.Repository{}
+	allRepos := []*github.Repository{}
 	client := github.NewClient(nil)
 	ctx := context.Background()
 	n := 100
@@ -20,27 +22,27 @@ func GetRepositories(user string) ([]*github.Repository, error) {
 			ListOptions: github.ListOptions{PerPage: n, Page: page},
 		}
 
-		new_repos, _, err := client.Repositories.List(ctx, user, opt)
+		newRepos, _, err := client.Repositories.List(ctx, user, opt)
 		if err != nil {
 			return nil, err
 		}
 
-		if len(new_repos) > n {
+		if len(newRepos) > n {
 			log.WithFields(log.Fields{
 				"page":           page,
 				"expected (max)": n,
-				"have":           len(new_repos),
+				"have":           len(newRepos),
 			}).Warn("API returned wrong number of repositories for page")
 		}
 
-		all_repos = append(all_repos, new_repos...)
+		allRepos = append(allRepos, newRepos...)
 
-		if len(new_repos) != n {
+		if len(newRepos) != n {
 			break
 		}
 
 		page++
 	}
 
-	return all_repos, nil
+	return allRepos, nil
 }

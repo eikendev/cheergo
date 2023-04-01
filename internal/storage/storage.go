@@ -1,3 +1,4 @@
+// Package storage provides convenience functions related to the file system.
 package storage
 
 import (
@@ -7,10 +8,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Store represents a collection of GitHub repositories.
 type Store struct {
 	Repositories map[string]github.Repository `yaml:"repositories"`
 }
 
+// Read returns a deserialized Store object from a given file.
 func Read(path string) (*Store, error) {
 	yfile, err := os.ReadFile(path) //#nosec G304
 	if os.IsNotExist(err) {
@@ -33,6 +36,7 @@ func Read(path string) (*Store, error) {
 	return &store, nil
 }
 
+// Write serializes and writes a Store object to a given file.
 func Write(path string, store *Store) error {
 	out, err := yaml.Marshal(store)
 	if err != nil {

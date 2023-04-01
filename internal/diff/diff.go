@@ -1,3 +1,4 @@
+// Package diff provides functionality to analyze updates and send notifications.
 package diff
 
 import (
@@ -10,25 +11,29 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Diff holds the difference between the latest update and the previous one.
 type Diff struct {
 	Stargazers int
 	Watchers   int
 	Forks      int
 }
 
-type DiffJar struct {
+// Jar holds a collection of Diff objects and information to notify the user.
+type Jar struct {
 	Diffs  map[string]Diff
 	Sender *router.ServiceRouter
 }
 
-func NewDiffJar(sender *router.ServiceRouter) *DiffJar {
-	return &DiffJar{
+// NewJar creates a new Jar given information to notify the user.
+func NewJar(sender *router.ServiceRouter) *Jar {
+	return &Jar{
 		Diffs:  make(map[string]Diff),
 		Sender: sender,
 	}
 }
 
-func (d *DiffJar) Add(name string, is *g.Repository, was *g.Repository) {
+// Add adds a new Diff into the Jar if a difference in the latest update was detected.
+func (d *Jar) Add(name string, is *g.Repository, was *g.Repository) {
 	starDiff := is.GetStargazersCount() - was.GetStargazersCount()
 	watchDiff := is.GetWatchersCount() - was.GetWatchersCount()
 	forksDiff := is.GetForksCount() - was.GetForksCount()
@@ -49,7 +54,8 @@ func (d *DiffJar) Add(name string, is *g.Repository, was *g.Repository) {
 	}
 }
 
-func (d *DiffJar) Send() error {
+// Send sends the update as a notifiction to the user.
+func (d *Jar) Send() error {
 	if len(d.Diffs) == 0 {
 		log.Info("No updates to send")
 		return nil

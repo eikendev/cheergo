@@ -1,3 +1,4 @@
+// Package main provides the main function as a starting point of this tool.
 package main
 
 import (
@@ -32,7 +33,7 @@ func main() {
 		kong.Description(fmt.Sprintf("%s (%s)", version, date)),
 	)
 
-	sender, err := shoutrrr.CreateSender(opts.ShoutrrrUrl)
+	sender, err := shoutrrr.CreateSender(opts.ShoutrrrURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,19 +43,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	new_repos, err := github.GetRepositories(opts.GitHubUser)
+	newRepos, err := github.GetRepositories(opts.GitHubUser)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.WithFields(log.Fields{
 		"user":  opts.GitHubUser,
-		"count": len(new_repos),
+		"count": len(newRepos),
 	}).Info("Fetched repositories")
 
-	jar := diff.NewDiffJar(sender)
+	jar := diff.NewJar(sender)
 
-	for _, is := range new_repos {
+	for _, is := range newRepos {
 		name := fmt.Sprintf("%s/%s", *is.Owner.Login, *is.Name)
 		was, ok := data.Repositories[name]
 		if ok {
