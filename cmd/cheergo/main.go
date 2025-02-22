@@ -42,6 +42,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if data == nil {
+		log.Fatal("Storage data is nil")
+		return
+	}
 
 	newRepos, err := github.GetRepositories(opts.GitHubUser)
 	if err != nil {
