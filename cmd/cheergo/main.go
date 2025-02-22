@@ -7,12 +7,12 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/containrrr/shoutrrr"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/eikendev/cheergo/internal/diff"
 	"github.com/eikendev/cheergo/internal/github"
 	"github.com/eikendev/cheergo/internal/options"
 	"github.com/eikendev/cheergo/internal/storage"
-
-	log "github.com/sirupsen/logrus"
 )
 
 var opts = options.Options{}

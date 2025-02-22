@@ -1,5 +1,6 @@
 OUT_DIR := ./out
 GO_FILES := $(shell find . -type f \( -iname '*.go' \))
+GO_MODULE := github.com/eikendev/cheergo
 
 .PHONY: build
 build:
