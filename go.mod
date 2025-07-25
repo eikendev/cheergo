@@ -3,7 +3,7 @@ module github.com/eikendev/cheergo
 go 1.24
 
 require (
-	github.com/alecthomas/kong v1.8.1
+	github.com/alecthomas/kong v1.12.1
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/google/go-github/v74 v74.0.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -15,7 +15,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 )
