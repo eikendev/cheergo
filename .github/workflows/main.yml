@@ -1,12 +1,23 @@
 name: Main
 
-on: push
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+    branches:
+      - 'main'
 
 permissions:
   contents: write
 
+env:
+  GO_VERSION: '1.24.5'
+
 jobs:
-  test:
+  test_publish:
     name: Test and publish
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -19,7 +30,7 @@ jobs:
       - name: Export GOBIN
         uses: actions/setup-go@v4
         with:
-          go-version: '1.24.0'
+          go-version: '${{env.GO_VERSION}}'
 
       - name: Install dependencies
         run: make setup
@@ -36,6 +47,6 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
