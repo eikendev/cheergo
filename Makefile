@@ -5,7 +5,7 @@ GO_MODULE := github.com/eikendev/cheergo
 .PHONY: build
 build:
 	mkdir -p $(OUT_DIR)
-	go build -ldflags="-w -s" -o $(OUT_DIR)/cheergo ./cmd/cheergo
+	go build -ldflags "-w -s" -o $(OUT_DIR)/cheergo ./cmd/cheergo
 
 .PHONY: clean
 clean:
