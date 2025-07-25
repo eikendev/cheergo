@@ -3,11 +3,11 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/alecthomas/kong"
 	"github.com/containrrr/shoutrrr"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/eikendev/cheergo/internal/diff"
 	"github.com/eikendev/cheergo/internal/github"
@@ -17,45 +17,38 @@ import (
 
 var opts = options.Options{}
 
-func init() {
-	log.SetFormatter(&log.TextFormatter{
-		DisableTimestamp: true,
-	})
-
-	log.SetOutput(os.Stdout)
-
-	log.SetLevel(log.InfoLevel)
-}
-
 func main() {
 	kong.Parse(
 		&opts,
-		kong.Description(fmt.Sprintf("%s (%s)", version, date)),
+		kong.Description("Monitors your GitHub repositories for new stars and followers, sending notifications when changes are detected."),
 	)
 
 	sender, err := shoutrrr.CreateSender(opts.ShoutrrrURL)
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Failed to create sender", "error", err)
+		os.Exit(1)
 	}
 
 	data, err := storage.Read(opts.Storage)
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Failed to read storage", "error", err)
+		os.Exit(1)
 	}
 	if data == nil {
-		log.Fatal("Storage data is nil")
+		slog.Error("Storage data is nil")
 		return
 	}
 
 	newRepos, err := github.GetRepositories(opts.GitHubUser)
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Failed to fetch repositories", "error", err)
+		os.Exit(1)
 	}
 
-	log.WithFields(log.Fields{
-		"user":  opts.GitHubUser,
-		"count": len(newRepos),
-	}).Info("Fetched repositories")
+	slog.Info("Fetched repositories",
+		"user", opts.GitHubUser,
+		"count", len(newRepos),
+	)
 
 	jar := diff.NewJar(sender)
 
@@ -70,11 +63,13 @@ func main() {
 
 	err = jar.Send()
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Failed to send notifications", "error", err)
+		os.Exit(1)
 	}
 
 	err = storage.Write(opts.Storage, data)
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Failed to write storage", "error", err)
+		os.Exit(1)
 	}
 }

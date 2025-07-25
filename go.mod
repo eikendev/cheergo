@@ -6,7 +6,6 @@ require (
 	github.com/alecthomas/kong v1.8.1
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/google/go-github/v37 v37.0.0
-	github.com/sirupsen/logrus v1.9.3
 	gopkg.in/yaml.v3 v3.0.1
 )
 

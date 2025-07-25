@@ -3,9 +3,9 @@ package github
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/google/go-github/v37/github"
-	log "github.com/sirupsen/logrus"
 )
 
 // GetRepositories returns a list of repositories from a given user.
@@ -28,11 +28,11 @@ func GetRepositories(user string) ([]*github.Repository, error) {
 		}
 
 		if len(newRepos) > n {
-			log.WithFields(log.Fields{
-				"page":           page,
-				"expected (max)": n,
-				"have":           len(newRepos),
-			}).Warn("API returned wrong number of repositories for page")
+			slog.Warn("API returned wrong number of repositories for page",
+				"page", page,
+				"expected_max", n,
+				"have", len(newRepos),
+			)
 		}
 
 		allRepos = append(allRepos, newRepos...)

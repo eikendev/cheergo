@@ -3,12 +3,12 @@ package diff
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	g "github.com/google/go-github/v37/github"
-	log "github.com/sirupsen/logrus"
 )
 
 // Diff holds the difference between the latest update and the previous one.
@@ -38,12 +38,12 @@ func (d *Jar) Add(name string, is *g.Repository, was *g.Repository) {
 	watchDiff := is.GetWatchersCount() - was.GetWatchersCount()
 	forksDiff := is.GetForksCount() - was.GetForksCount()
 
-	log.WithFields(log.Fields{
-		"starDiff":  starDiff,
-		"watchDiff": watchDiff,
-		"forksDiff": forksDiff,
-		"repo":      name,
-	}).Debug("Comparing repository status")
+	slog.Debug("Comparing repository status",
+		"starDiff", starDiff,
+		"watchDiff", watchDiff,
+		"forksDiff", forksDiff,
+		"repo", name,
+	)
 
 	if starDiff > 0 || watchDiff > 0 || forksDiff > 0 {
 		d.Diffs[name] = Diff{
@@ -57,7 +57,7 @@ func (d *Jar) Add(name string, is *g.Repository, was *g.Repository) {
 // Send sends the update as a notifiction to the user.
 func (d *Jar) Send() error {
 	if len(d.Diffs) == 0 {
-		log.Info("No updates to send")
+		slog.Info("No updates to send")
 		return nil
 	}
 
@@ -79,9 +79,7 @@ func (d *Jar) Send() error {
 		msg += fmt.Sprintf("%s has %s!\n", name, strings.Join(updates, ", "))
 	}
 
-	log.WithFields(log.Fields{
-		"msg": msg,
-	}).Info("Sending notification")
+	slog.Info("Sending notification", "msg", msg)
 
 	err := d.Sender.Send(msg, &types.Params{})
 	if len(err) > 0 && err[0] != nil {
