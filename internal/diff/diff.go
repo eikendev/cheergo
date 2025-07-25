@@ -8,7 +8,7 @@ import (
 
 	"github.com/containrrr/shoutrrr/pkg/router"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	g "github.com/google/go-github/v37/github"
+	g "github.com/google/go-github/v74/github"
 )
 
 // Diff holds the difference between the latest update and the previous one.

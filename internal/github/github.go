@@ -5,7 +5,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/google/go-github/v37/github"
+	"github.com/google/go-github/v74/github"
 )
 
 // GetRepositories returns a list of repositories from a given user.
@@ -17,12 +17,12 @@ func GetRepositories(user string) ([]*github.Repository, error) {
 	page := 1
 
 	for {
-		opt := &github.RepositoryListOptions{
+		opt := &github.RepositoryListByUserOptions{
 			Type:        "owner",
 			ListOptions: github.ListOptions{PerPage: n, Page: page},
 		}
 
-		newRepos, _, err := client.Repositories.List(ctx, user, opt)
+		newRepos, _, err := client.Repositories.ListByUser(ctx, user, opt)
 		if err != nil {
 			return nil, err
 		}
