@@ -11,6 +11,7 @@ checksum:
 
 archives:
   - id: cheergo
-    builds:
+    ids:
       - cheergo
-    format: tar.gz
+    formats:
+      - tar.gz
