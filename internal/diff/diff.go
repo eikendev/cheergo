@@ -1,13 +1,9 @@
-// Package diff provides functionality to analyze updates and send notifications.
+// Package diff provides functionality to analyze updates.
 package diff
 
 import (
-	"fmt"
 	"log/slog"
-	"strings"
 
-	"github.com/containrrr/shoutrrr/pkg/router"
-	"github.com/containrrr/shoutrrr/pkg/types"
 	g "github.com/google/go-github/v74/github"
 )
 
@@ -20,15 +16,13 @@ type Diff struct {
 
 // Jar holds a collection of Diff objects and information to notify the user.
 type Jar struct {
-	Diffs  map[string]Diff
-	Sender *router.ServiceRouter
+	Diffs map[string]Diff
 }
 
 // NewJar creates a new Jar given information to notify the user.
-func NewJar(sender *router.ServiceRouter) *Jar {
+func NewJar() *Jar {
 	return &Jar{
-		Diffs:  make(map[string]Diff),
-		Sender: sender,
+		Diffs: make(map[string]Diff),
 	}
 }
 
@@ -54,37 +48,16 @@ func (d *Jar) Add(name string, is *g.Repository, was *g.Repository) {
 	}
 }
 
-// Send sends the update as a notifiction to the user.
-func (d *Jar) Send() error {
-	if len(d.Diffs) == 0 {
-		slog.Info("No updates to send")
-		return nil
-	}
-
-	msg := ""
-
-	for name, diff := range d.Diffs {
-		var updates []string
-
-		if diff.Stargazers > 0 {
-			updates = append(updates, fmt.Sprintf("%d new stargazers", diff.Stargazers))
+// ComputeDiffs compares newRepos with prevRepos and populates Diffs.
+func (d *Jar) ComputeDiffs(newRepos []*g.Repository, prevRepos map[string]g.Repository) {
+	for _, is := range newRepos {
+		if is.Owner == nil || is.Name == nil {
+			continue
 		}
-		if diff.Watchers > 0 {
-			updates = append(updates, fmt.Sprintf("%d new watchers", diff.Watchers))
+		name := *is.Owner.Login + "/" + *is.Name
+		was, ok := prevRepos[name]
+		if ok {
+			d.Add(name, is, &was)
 		}
-		if diff.Forks > 0 {
-			updates = append(updates, fmt.Sprintf("%d new forks", diff.Forks))
-		}
-
-		msg += fmt.Sprintf("%s has %s!\n", name, strings.Join(updates, ", "))
 	}
-
-	slog.Info("Sending notification", "msg", msg)
-
-	err := d.Sender.Send(msg, &types.Params{})
-	if len(err) > 0 && err[0] != nil {
-		return fmt.Errorf("unable to send notification: %v", err)
-	}
-
-	return nil
 }

@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"log/slog"
 	"os"
 
@@ -9,6 +8,7 @@ import (
 
 	"github.com/eikendev/cheergo/internal/diff"
 	"github.com/eikendev/cheergo/internal/github"
+	"github.com/eikendev/cheergo/internal/notify"
 	"github.com/eikendev/cheergo/internal/options"
 	"github.com/eikendev/cheergo/internal/storage"
 )
@@ -47,18 +47,19 @@ func (cmd *RunCommand) Run(_ *options.Options) error {
 		"count", len(newRepos),
 	)
 
-	jar := diff.NewJar(sender)
+	jar := diff.NewJar()
+	jar.ComputeDiffs(newRepos, data.Repositories)
 
 	for _, is := range newRepos {
-		name := fmt.Sprintf("%s/%s", *is.Owner.Login, *is.Name)
-		was, ok := data.Repositories[name]
-		if ok {
-			jar.Add(name, is, &was)
+		if is.Owner == nil || is.Name == nil {
+			continue
 		}
+		name := *is.Owner.Login + "/" + *is.Name
 		data.Repositories[name] = *is
 	}
 
-	err = jar.Send()
+	notifier := notify.NewShoutrrrNotifier(sender)
+	err = notifier.Notify(jar.Diffs)
 	if err != nil {
 		slog.Error("Failed to send notifications", "error", err)
 		os.Exit(1)
