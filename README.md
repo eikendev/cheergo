@@ -28,7 +28,7 @@ Ever wondered who’s cheering for your open source work? **Cheergo** keeps you 
 1. **Cheergo** checks your GitHub account for new stars and followers.
 2. It compares the latest state with your previous data (stored locally in a YAML file).
 3. When it detects something new, it crafts a notification, optionally using an LLM for a smart summary.
-4. The message is sent to your chosen channel(s) via Shoutrrr.
+4. The message is sent to your chosen channel via Shoutrrr.
 
 ## 📦 Installation
 
