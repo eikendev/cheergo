@@ -1,8 +1,9 @@
-// Package github provides functionality related to a GitHub account.
-package github
+// Package repository provides functionality related to a GitHub repository.
+package repository
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"github.com/google/go-github/v74/github"
@@ -45,4 +46,18 @@ func GetRepositories(user string) ([]*github.Repository, error) {
 	}
 
 	return allRepos, nil
+}
+
+// RepoFullName returns the "owner/name" string for a given repository.
+func RepoFullName(repo *github.Repository) (string, error) {
+	if repo == nil {
+		return "", errors.New("repository is nil")
+	}
+	if repo.Owner == nil || repo.Owner.Login == nil || *repo.Owner.Login == "" {
+		return "", errors.New("repository owner is missing")
+	}
+	if repo.Name == nil || *repo.Name == "" {
+		return "", errors.New("repository name is missing")
+	}
+	return *repo.Owner.Login + "/" + *repo.Name, nil
 }

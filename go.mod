@@ -6,6 +6,7 @@ require (
 	github.com/alecthomas/kong v1.12.1
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/google/go-github/v74 v74.0.0
+	github.com/sashabaranov/go-openai v1.40.5
 	gopkg.in/yaml.v3 v3.0.1
 )
 

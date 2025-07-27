@@ -7,10 +7,12 @@ import (
 	"github.com/containrrr/shoutrrr"
 
 	"github.com/eikendev/cheergo/internal/diff"
-	"github.com/eikendev/cheergo/internal/github"
+	"github.com/eikendev/cheergo/internal/logging"
 	"github.com/eikendev/cheergo/internal/notify"
 	"github.com/eikendev/cheergo/internal/options"
+	"github.com/eikendev/cheergo/internal/repository"
 	"github.com/eikendev/cheergo/internal/storage"
+	"github.com/eikendev/cheergo/internal/summarizer"
 )
 
 // RunCommand represents the run subcommand.
@@ -20,6 +22,8 @@ type RunCommand struct {
 
 // Run executes the main logic of the application.
 func (cmd *RunCommand) Run(_ *options.Options) error {
+	logging.Setup(cmd.Verbose)
+
 	sender, err := shoutrrr.CreateSender(cmd.ShoutrrrURL)
 	if err != nil {
 		slog.Error("Failed to create sender", "error", err)
@@ -36,7 +40,7 @@ func (cmd *RunCommand) Run(_ *options.Options) error {
 		return nil
 	}
 
-	newRepos, err := github.GetRepositories(cmd.GitHubUser)
+	newRepos, err := repository.GetRepositories(cmd.GitHubUser)
 	if err != nil {
 		slog.Error("Failed to fetch repositories", "error", err)
 		os.Exit(1)
@@ -50,20 +54,28 @@ func (cmd *RunCommand) Run(_ *options.Options) error {
 	jar := diff.NewJar()
 	jar.ComputeDiffs(newRepos, data.Repositories)
 
-	for _, is := range newRepos {
-		if is.Owner == nil || is.Name == nil {
-			continue
-		}
-		name := *is.Owner.Login + "/" + *is.Name
-		data.Repositories[name] = *is
+	var summarizerImpl summarizer.Summarizer
+	if cmd.LLMApiKey != "" {
+		summarizerImpl = summarizer.NewLLMSummarizer()
+		slog.Info("Using LLM summarizer")
+	} else {
+		summarizerImpl = summarizer.NewStaticSummarizer()
+		slog.Info("Using static summarizer")
+	}
+
+	messageText, err := summarizerImpl.GenerateNotificationMessage(jar, cmd.Options)
+	if err != nil {
+		slog.Error("Failed to generate notification message", "error", err)
+		os.Exit(1)
 	}
 
 	notifier := notify.NewShoutrrrNotifier(sender)
-	err = notifier.Notify(jar.Diffs)
-	if err != nil {
-		slog.Error("Failed to send notifications", "error", err)
+	if err := notifier.NotifyMessage(messageText); err != nil {
+		slog.Error("Failed to send notification", "error", err)
 		os.Exit(1)
 	}
+
+	data.UpdateRepositoriesFromSlice(newRepos)
 
 	err = storage.Write(cmd.Storage, data)
 	if err != nil {
