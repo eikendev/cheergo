@@ -1,10 +1,10 @@
 <div align="center">
-	<h1>cheergo</h1>
+	<h1>Cheergo</h1>
 	<h4 align="center">
 		Stay in the loop when your projects get noticed.
 	</h4>
 	<p>
-		<strong>cheergo</strong> notifies you when your GitHub repositories are starred or followed, so you never miss a moment of recognition.
+		<strong>Cheergo</strong> notifies you when your GitHub repositories are starred or followed, so you never miss a moment of recognition.
 	</p>
 </div>
 
@@ -13,9 +13,9 @@
 	<a href="https://github.com/eikendev/cheergo/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/eikendev/cheergo"/></a>&nbsp;
 </p>
 
-## ✨ Why cheergo?
+## ✨ Why Cheergo?
 
-Ever wondered who’s cheering for your open source work? **cheergo** keeps you connected to your community by sending you notifications whenever someone stars or follows your repositories. Whether you’re a solo dev or part of a team, cheergo helps you celebrate every milestone.
+Ever wondered who’s cheering for your open source work? **Cheergo** keeps you connected to your community by sending you notifications whenever someone stars or follows your repositories. Whether you’re a solo dev or part of a team, Cheergo helps you celebrate every milestone.
 
 ## 🚀 Features
 
@@ -25,7 +25,7 @@ Ever wondered who’s cheering for your open source work? **cheergo** keeps you 
 
 ## 🛠️ How It Works
 
-1. **cheergo** checks your GitHub account for new stars and followers.
+1. **Cheergo** checks your GitHub account for new stars and followers.
 2. It compares the latest state with your previous data (stored locally in a YAML file).
 3. When it detects something new, it crafts a notification, optionally using an LLM for a smart summary.
 4. The message is sent to your chosen channel(s) via Shoutrrr.
@@ -71,7 +71,8 @@ _All options can also be set via environment variables (see below)._
 
 ## 🔔 Supported Notification Channels
 
-cheergo uses [Shoutrrr](https://containrrr.dev/shoutrrr/latest/services/overview/) for notifications, supporting:
+Cheergo uses [Shoutrrr](https://containrrr.dev/shoutrrr/latest/services/overview/) for notifications, supporting:
+
 - Email (SMTP)
 - Telegram
 - Slack
