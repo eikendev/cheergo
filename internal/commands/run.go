@@ -30,6 +30,15 @@ func (cmd *RunCommand) Run(_ *options.Options) error {
 		os.Exit(1)
 	}
 
+	var summarizerImpl summarizer.Summarizer
+	if cmd.LLMApiKey != "" {
+		summarizerImpl = summarizer.NewLLMSummarizer()
+		slog.Info("Using LLM summarizer")
+	} else {
+		summarizerImpl = summarizer.NewStaticSummarizer()
+		slog.Info("Using static summarizer")
+	}
+
 	data, err := storage.Read(cmd.Storage)
 	if err != nil {
 		slog.Error("Failed to read storage", "error", err)
@@ -54,13 +63,9 @@ func (cmd *RunCommand) Run(_ *options.Options) error {
 	jar := diff.NewJar()
 	jar.ComputeDiffs(newRepos, data.Repositories)
 
-	var summarizerImpl summarizer.Summarizer
-	if cmd.LLMApiKey != "" {
-		summarizerImpl = summarizer.NewLLMSummarizer()
-		slog.Info("Using LLM summarizer")
-	} else {
-		summarizerImpl = summarizer.NewStaticSummarizer()
-		slog.Info("Using static summarizer")
+	if len(jar.Diffs) == 0 {
+		slog.Info("No repository changes detected", "diff_count", len(jar.Diffs))
+		return nil
 	}
 
 	messageText, err := summarizerImpl.GenerateNotificationMessage(jar, cmd.Options)

@@ -26,14 +26,14 @@ func (s StaticSummarizer) GenerateNotificationMessage(jar *diff.Jar, _ *options.
 
 	for name, diff := range jar.Diffs {
 		var updates []string
-		if diff.Stargazers > 0 {
-			updates = append(updates, fmt.Sprintf("%d new stargazers", diff.Stargazers))
+		if diff.Stargazers.Diff > 0 {
+			updates = append(updates, fmt.Sprintf("%d new stargazers", diff.Stargazers.Diff))
 		}
-		if diff.Subscribers > 0 {
-			updates = append(updates, fmt.Sprintf("%d new subscribers", diff.Subscribers))
+		if diff.Subscribers.Diff > 0 {
+			updates = append(updates, fmt.Sprintf("%d new subscribers", diff.Subscribers.Diff))
 		}
-		if diff.Forks > 0 {
-			updates = append(updates, fmt.Sprintf("%d new forks", diff.Forks))
+		if diff.Forks.Diff > 0 {
+			updates = append(updates, fmt.Sprintf("%d new forks", diff.Forks.Diff))
 		}
 		sb.WriteString(fmt.Sprintf("%s has %s!\n", name, strings.Join(updates, ", ")))
 	}

@@ -29,7 +29,12 @@ func NewLLMSummarizer() Summarizer {
 
 const (
 	systemMessage      = "You are an assistant that generates short, motivating notification messages for developers based on recent GitHub repository activity."
-	userPromptTemplate = `You will receive a list of repository changes. Each entry may contain changes in the number of stars, watchers, or subscribers. Your task is to write a single concise and naturally worded plain-text message that highlights the most interesting changes across all repositories.
+	userPromptTemplate = `Your task is to write a single concise and naturally worded plain-text message that highlights the most interesting changes across all repositories.
+
+You will receive a list of repository changes. Each entry contains:
+- The repository name
+- The diff (numeric changes in stargazers, subscribers, forks)
+- Some repository metadata
 
 Requirements:
 - The message must be plain text (no Markdown or formatting)
@@ -49,15 +54,15 @@ Here is the user's name: %s
 
 Here is the current time (ISO 8601, UTC): %s
 
-Here is the list of repository changes:
+Here is the list of repositories with respective changes:
 %s`
 )
 
 // GenerateNotificationMessage generates a notification message using the LLM.
 func (s *LLMSummarizer) GenerateNotificationMessage(jar *diff.Jar, opts *options.Options) (string, error) {
-	diffsJSON, err := json.MarshalIndent(jar.Diffs, "", "  ")
+	reposJSON, err := json.MarshalIndent(jar.Diffs, "", "  ")
 	if err != nil {
-		slog.Warn("Failed to marshal diffs to JSON", "error", err)
+		slog.Warn("Failed to marshal repository diffs to JSON", "error", err)
 		return "", err
 	}
 
@@ -65,13 +70,22 @@ func (s *LLMSummarizer) GenerateNotificationMessage(jar *diff.Jar, opts *options
 		userPromptTemplate,
 		opts.GitHubUser,
 		time.Now().UTC().Format(time.RFC3339),
-		string(diffsJSON),
+		string(reposJSON),
 	)
+
+	slog.Debug("Assembled LLM prompt", "prompt", prompt)
 
 	schema, err := jsonschema.GenerateSchemaForType(llmNotification{})
 	if err != nil {
 		slog.Warn("Failed to generate JSON schema", "error", err)
 		return "", err
+	}
+
+	schemaJSON, err := json.MarshalIndent(schema, "", "  ")
+	if err != nil {
+		slog.Warn("Failed to marshal schema to JSON", "error", err)
+	} else {
+		slog.Debug("Created LLM schema", "schema", string(schemaJSON))
 	}
 
 	config := openai.DefaultConfig(opts.LLMApiKey)

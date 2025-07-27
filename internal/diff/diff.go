@@ -9,11 +9,23 @@ import (
 	"github.com/eikendev/cheergo/internal/repository"
 )
 
-// Diff holds the difference between the latest update and the previous one.
+// StatChange holds the absolute and delta values for a repository statistic (e.g., stargazers, subscribers, forks).
+type StatChange struct {
+	Before int `json:"before"`
+	After  int `json:"after"`
+	Diff   int `json:"diff"`
+}
+
+// Diff holds the before/after/delta values for repository statistics and static metadata for LLM context.
 type Diff struct {
-	Stargazers  int
-	Subscribers int
-	Forks       int
+	Stargazers  StatChange `json:"stargazers"`
+	Subscribers StatChange `json:"subscribers"`
+	Forks       StatChange `json:"forks"`
+	Description string     `json:"description"`
+	Language    string     `json:"language"`
+	License     string     `json:"license"`
+	CreatedAt   string     `json:"createdAt"`
+	UpdatedAt   string     `json:"updatedAt"`
 }
 
 // Jar holds a collection of Diff objects and information to notify the user.
@@ -28,24 +40,56 @@ func NewJar() *Jar {
 	}
 }
 
+func makeStatChange(before, after int) StatChange {
+	return StatChange{
+		Before: before,
+		After:  after,
+		Diff:   after - before,
+	}
+}
+
+func extractRepoMetadata(repo *g.Repository) (desc, lang, license, created, updated string) {
+	desc = repo.GetDescription()
+	lang = repo.GetLanguage()
+	if repo.GetLicense() != nil {
+		license = repo.GetLicense().GetName()
+	}
+	created = repo.GetCreatedAt().String()
+	updated = repo.GetUpdatedAt().String()
+	return
+}
+
 // Add adds a new Diff into the Jar if a difference in the latest update was detected.
-func (d *Jar) Add(name string, is *g.Repository, was *g.Repository) {
-	starDiff := is.GetStargazersCount() - was.GetStargazersCount()
-	subscribersDiff := is.GetSubscribersCount() - was.GetSubscribersCount()
-	forksDiff := is.GetForksCount() - was.GetForksCount()
+func (d *Jar) Add(name string, is, was *g.Repository) {
+	stargazers := makeStatChange(was.GetStargazersCount(), is.GetStargazersCount())
+	subscribers := makeStatChange(was.GetSubscribersCount(), is.GetSubscribersCount())
+	forks := makeStatChange(was.GetForksCount(), is.GetForksCount())
 
 	slog.Debug("Comparing repository status",
-		"starDiff", starDiff,
-		"subscribersDiff", subscribersDiff,
-		"forksDiff", forksDiff,
+		"starDiff", stargazers.Diff,
+		"subscribersDiff", subscribers.Diff,
+		"forksDiff", forks.Diff,
 		"repository", name,
 	)
 
-	if starDiff > 0 || subscribersDiff > 0 || forksDiff > 0 {
+	if stargazers.Diff > 0 || subscribers.Diff > 0 || forks.Diff > 0 {
+		slog.Info("Repository change detected",
+			"repository", name,
+			"stargazers", stargazers,
+			"subscribers", subscribers,
+			"forks", forks,
+		)
+
+		desc, lang, license, created, updated := extractRepoMetadata(is)
 		d.Diffs[name] = Diff{
-			Stargazers:  starDiff,
-			Subscribers: subscribersDiff,
-			Forks:       forksDiff,
+			Stargazers:  stargazers,
+			Subscribers: subscribers,
+			Forks:       forks,
+			Description: desc,
+			Language:    lang,
+			License:     license,
+			CreatedAt:   created,
+			UpdatedAt:   updated,
 		}
 	}
 }
