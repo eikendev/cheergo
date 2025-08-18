@@ -2,6 +2,7 @@
 package storage
 
 import (
+	"log/slog"
 	"os"
 
 	gh "github.com/google/go-github/v74/github"
@@ -50,6 +51,8 @@ func (s *Store) UpdateRepositoriesFromSlice(repos []*gh.Repository) {
 			s.Repositories[name] = *repo
 		}
 	}
+
+	slog.Debug("Updated repositories in store", "count", len(s.Repositories))
 }
 
 // Write serializes and writes a Store object to a given file.
@@ -63,6 +66,8 @@ func Write(path string, store *Store) error {
 	if err != nil {
 		return err
 	}
+
+	slog.Info("Wrote storage file", "path", path, "repo_count", len(store.Repositories))
 
 	return nil
 }

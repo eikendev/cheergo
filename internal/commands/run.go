@@ -63,7 +63,20 @@ func (cmd *RunCommand) Run(_ *options.Options) error {
 	jar := diff.NewJar()
 	jar.ComputeDiffs(newRepos, data.Repositories)
 
+	// Helper to persist latest repository snapshot.
+	persist := func() {
+		data.UpdateRepositoriesFromSlice(newRepos)
+
+		if err := storage.Write(cmd.Storage, data); err != nil {
+			slog.Error("Failed to write storage", "error", err)
+			os.Exit(1)
+		}
+	}
+
 	if len(jar.Diffs) == 0 {
+		// Persist even if there are no diffs in case there is no storage file yet.
+		persist()
+
 		slog.Info("No repository changes detected", "diff_count", len(jar.Diffs))
 		return nil
 	}
@@ -80,13 +93,7 @@ func (cmd *RunCommand) Run(_ *options.Options) error {
 		os.Exit(1)
 	}
 
-	data.UpdateRepositoriesFromSlice(newRepos)
-
-	err = storage.Write(cmd.Storage, data)
-	if err != nil {
-		slog.Error("Failed to write storage", "error", err)
-		os.Exit(1)
-	}
+	persist()
 
 	return nil
 }
