@@ -5,10 +5,12 @@ import (
 	"github.com/alecthomas/kong"
 
 	"github.com/eikendev/cheergo/internal/commands"
+	"github.com/eikendev/cheergo/internal/logging"
 	"github.com/eikendev/cheergo/internal/options"
 )
 
 type CLI struct {
+	Verbose bool                    `name:"verbose" help:"Enable verbose (debug) logging." env:"CHEERGO_VERBOSE"`
 	Run     commands.RunCommand     `cmd:"" help:"Monitor for new stars and followers on your GitHub repositories."`
 	Version commands.VersionCommand `cmd:"" help:"Show version information."`
 }
@@ -21,6 +23,8 @@ func main() {
 		kong.UsageOnError(),
 		kong.Bind(&opts),
 	)
+
+	logging.Setup(cli.Verbose)
 
 	err := kctx.Run()
 	kctx.FatalIfErrorf(err)

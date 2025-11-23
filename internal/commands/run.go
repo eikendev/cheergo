@@ -9,7 +9,6 @@ import (
 	"github.com/containrrr/shoutrrr"
 
 	"github.com/eikendev/cheergo/internal/diff"
-	"github.com/eikendev/cheergo/internal/logging"
 	"github.com/eikendev/cheergo/internal/notify"
 	"github.com/eikendev/cheergo/internal/options"
 	"github.com/eikendev/cheergo/internal/repository"
@@ -26,8 +25,6 @@ type RunCommand struct {
 
 // Run executes the main logic of the application.
 func (cmd *RunCommand) Run(_ *options.Options) error {
-	logging.Setup(cmd.Verbose)
-
 	sender, err := shoutrrr.CreateSender(cmd.ShoutrrrURL)
 	if err != nil {
 		slog.Error("Failed to create sender", "error", err)
