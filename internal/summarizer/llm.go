@@ -54,9 +54,11 @@ Here is the user's name: %s
 
 Here is the current time (ISO 8601, UTC): %s
 
-Here is the list of repositories with respective changes:
-%s`
+	Here is the list of repositories with respective changes:
+	%s`
 )
+
+const llmRequestTimeout = 30 * time.Second
 
 // GenerateNotificationMessage generates a notification message using the LLM.
 func (s *LLMSummarizer) GenerateNotificationMessage(jar *diff.Jar, opts *options.Options) (string, error) {
@@ -91,7 +93,8 @@ func (s *LLMSummarizer) GenerateNotificationMessage(jar *diff.Jar, opts *options
 	config := openai.DefaultConfig(opts.LLMApiKey)
 	config.BaseURL = opts.LLMBaseURL
 	client := openai.NewClientWithConfig(config)
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), llmRequestTimeout)
+	defer cancel()
 	resp, err := client.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
 		Model: opts.LLMModel,
 		Messages: []openai.ChatCompletionMessage{
@@ -116,6 +119,11 @@ func (s *LLMSummarizer) GenerateNotificationMessage(jar *diff.Jar, opts *options
 	if err != nil {
 		slog.Warn("OpenAI API call failed", "error", err)
 		return "", err
+	}
+
+	if len(resp.Choices) == 0 {
+		slog.Warn("OpenAI API call returned no choices")
+		return "", fmt.Errorf("no choices returned from LLM")
 	}
 
 	var out llmNotification

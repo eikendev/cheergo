@@ -2,6 +2,7 @@
 package notify
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -32,8 +33,14 @@ func (n *ShoutrrrNotifier) NotifyMessage(msg string) error {
 	}
 
 	errs := n.Sender.Send(msg, &types.Params{})
-	if len(errs) > 0 && errs[0] != nil {
-		return fmt.Errorf("unable to send notification: %v", errs)
+	var sendErr error
+	for _, err := range errs {
+		if err != nil {
+			sendErr = errors.Join(sendErr, err)
+		}
+	}
+	if sendErr != nil {
+		return fmt.Errorf("unable to send notification: %w", sendErr)
 	}
 
 	slog.Info("Notification sent", "message", msg)

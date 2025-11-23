@@ -9,40 +9,42 @@ import (
 	"github.com/google/go-github/v74/github"
 )
 
+const perPage = 100
+
 // GetRepositories returns a list of repositories from a given user.
-func GetRepositories(user string) ([]*github.Repository, error) {
+func GetRepositories(ctx context.Context, user string) ([]*github.Repository, error) {
+	if ctx == nil {
+		return nil, errors.New("context is nil")
+	}
+
 	allRepos := []*github.Repository{}
 	client := github.NewClient(nil)
-	ctx := context.Background()
-	n := 100
-	page := 1
+	opt := &github.RepositoryListByUserOptions{
+		Type:        "owner",
+		ListOptions: github.ListOptions{PerPage: perPage},
+	}
 
 	for {
-		opt := &github.RepositoryListByUserOptions{
-			Type:        "owner",
-			ListOptions: github.ListOptions{PerPage: n, Page: page},
-		}
-
-		newRepos, _, err := client.Repositories.ListByUser(ctx, user, opt)
+		newRepos, resp, err := client.Repositories.ListByUser(ctx, user, opt)
 		if err != nil {
 			return nil, err
 		}
 
-		if len(newRepos) > n {
-			slog.Warn("API returned wrong number of repositories for page",
-				"page", page,
-				"expected_max", n,
+		if len(newRepos) > perPage {
+			slog.Warn("API returned unexpected number of repositories for page",
+				"page", opt.Page,
+				"expected_max", perPage,
 				"have", len(newRepos),
 			)
 		}
 
 		allRepos = append(allRepos, newRepos...)
 
-		if len(newRepos) != n {
+		if resp == nil || resp.NextPage == 0 {
 			break
 		}
 
-		page++
+		opt.Page = resp.NextPage
 	}
 
 	return allRepos, nil

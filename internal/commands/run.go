@@ -1,8 +1,10 @@
 package commands
 
 import (
+	"context"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/containrrr/shoutrrr"
 
@@ -14,6 +16,8 @@ import (
 	"github.com/eikendev/cheergo/internal/storage"
 	"github.com/eikendev/cheergo/internal/summarizer"
 )
+
+const repoFetchTimeout = 30 * time.Second
 
 // RunCommand represents the run subcommand.
 type RunCommand struct {
@@ -44,12 +48,10 @@ func (cmd *RunCommand) Run(_ *options.Options) error {
 		slog.Error("Failed to read storage", "error", err)
 		os.Exit(1)
 	}
-	if data == nil {
-		slog.Error("Storage data is nil")
-		return nil
-	}
 
-	newRepos, err := repository.GetRepositories(cmd.GitHubUser)
+	ctx, cancel := context.WithTimeout(context.Background(), repoFetchTimeout)
+	newRepos, err := repository.GetRepositories(ctx, cmd.GitHubUser)
+	cancel()
 	if err != nil {
 		slog.Error("Failed to fetch repositories", "error", err)
 		os.Exit(1)
