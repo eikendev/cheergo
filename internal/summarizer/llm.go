@@ -12,7 +12,6 @@ import (
 	"github.com/sashabaranov/go-openai/jsonschema"
 
 	"github.com/eikendev/cheergo/internal/diff"
-	"github.com/eikendev/cheergo/internal/options"
 )
 
 type llmNotification struct {
@@ -61,7 +60,7 @@ Here is the current time (ISO 8601, UTC): %s
 const llmRequestTimeout = 30 * time.Second
 
 // GenerateNotificationMessage generates a notification message using the LLM.
-func (s *LLMSummarizer) GenerateNotificationMessage(jar *diff.Jar, opts *options.Options) (string, error) {
+func (s *LLMSummarizer) GenerateNotificationMessage(jar *diff.Jar, cfg Config) (string, error) {
 	reposJSON, err := json.MarshalIndent(jar.Diffs, "", "  ")
 	if err != nil {
 		slog.Warn("Failed to marshal repository diffs to JSON", "error", err)
@@ -70,7 +69,7 @@ func (s *LLMSummarizer) GenerateNotificationMessage(jar *diff.Jar, opts *options
 
 	prompt := fmt.Sprintf(
 		userPromptTemplate,
-		opts.GitHubUser,
+		cfg.GitHubUser,
 		time.Now().UTC().Format(time.RFC3339),
 		string(reposJSON),
 	)
@@ -90,13 +89,13 @@ func (s *LLMSummarizer) GenerateNotificationMessage(jar *diff.Jar, opts *options
 		slog.Debug("Created LLM schema", "schema", string(schemaJSON))
 	}
 
-	config := openai.DefaultConfig(opts.LLMApiKey)
-	config.BaseURL = opts.LLMBaseURL
+	config := openai.DefaultConfig(cfg.LLMApiKey)
+	config.BaseURL = cfg.LLMBaseURL
 	client := openai.NewClientWithConfig(config)
 	ctx, cancel := context.WithTimeout(context.Background(), llmRequestTimeout)
 	defer cancel()
 	resp, err := client.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
-		Model: opts.LLMModel,
+		Model: cfg.LLMModel,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,

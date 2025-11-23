@@ -4,15 +4,13 @@ package commands
 import (
 	"fmt"
 	"runtime/debug"
-
-	"github.com/eikendev/cheergo/internal/options"
 )
 
 // VersionCommand represents the options specific to the version command.
 type VersionCommand struct{}
 
 // Run is the function for the version command.
-func (*VersionCommand) Run(_ *options.Options) error {
+func (*VersionCommand) Run() error {
 	buildInfo, ok := debug.ReadBuildInfo()
 	if !ok {
 		return fmt.Errorf("build info not available")

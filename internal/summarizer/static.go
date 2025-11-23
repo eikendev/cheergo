@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/eikendev/cheergo/internal/diff"
-	"github.com/eikendev/cheergo/internal/options"
 )
 
 // StaticSummarizer implements Summarizer with a static message generator.
@@ -17,7 +16,7 @@ func NewStaticSummarizer() Summarizer {
 }
 
 // GenerateNotificationMessage generates a static notification message from repository diffs.
-func (s StaticSummarizer) GenerateNotificationMessage(jar *diff.Jar, _ *options.Options) (string, error) {
+func (s StaticSummarizer) GenerateNotificationMessage(jar *diff.Jar, _ Config) (string, error) {
 	if len(jar.Diffs) == 0 {
 		return "", nil
 	}

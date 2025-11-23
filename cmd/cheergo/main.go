@@ -6,7 +6,6 @@ import (
 
 	"github.com/eikendev/cheergo/internal/commands"
 	"github.com/eikendev/cheergo/internal/logging"
-	"github.com/eikendev/cheergo/internal/options"
 )
 
 type CLI struct {
@@ -17,11 +16,9 @@ type CLI struct {
 
 func main() {
 	var cli CLI
-	var opts options.Options
 	kctx := kong.Parse(&cli,
 		kong.Description("cheergo is a CLI tool for monitoring your GitHub repositories. It can notify you about new stars and followers."),
 		kong.UsageOnError(),
-		kong.Bind(&opts),
 	)
 
 	logging.Setup(cli.Verbose)
