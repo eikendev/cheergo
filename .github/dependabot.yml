@@ -35,10 +35,6 @@ updates:
       - "dependencies"
     pull-request-branch-name:
       separator: "-"
-    cooldown:
-      semver-major-days: 14
-      semver-minor-days: 7
-      semver-patch-days: 2
     groups:
       github-actions:
         patterns:
