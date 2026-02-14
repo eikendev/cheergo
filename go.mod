@@ -3,7 +3,7 @@ module github.com/eikendev/cheergo
 go 1.26
 
 require (
-	github.com/alecthomas/kong v1.13.0
+	github.com/alecthomas/kong v1.14.0
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/google/go-github/v74 v74.0.0
 	github.com/sashabaranov/go-openai v1.41.2
