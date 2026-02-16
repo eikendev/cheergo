@@ -9,7 +9,7 @@
 </div>
 
 <p align="center">
-	<a href="https://github.com/eikendev/cheergo/actions"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/eikendev/cheergo/pr.yaml?branch=main"/></a>&nbsp;
+	<a href="https://github.com/eikendev/cheergo/actions"><img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/eikendev/cheergo/release.yaml?branch=main"/></a>&nbsp;
 	<a href="https://github.com/eikendev/cheergo/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/eikendev/cheergo"/></a>&nbsp;
 </p>
 
