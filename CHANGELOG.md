@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/eikendev/cheergo/compare/v0.1.2...v0.1.3) (2026-02-16)
+
+
+### Bug Fixes
+
+* trigger build with clean version command ([3980ccb](https://github.com/eikendev/cheergo/commit/3980ccb8461608bd837e7f1e85a7867bc24c2b92))
+
 ## [0.1.2](https://github.com/eikendev/cheergo/compare/v0.1.1...v0.1.2) (2026-02-16)
 
 
