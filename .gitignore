@@ -1,4 +1,5 @@
 storage.yml
+dist/
 out/
 
 # Configuration files for coding agents
