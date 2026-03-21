@@ -48,15 +48,16 @@ func makeStatChange(before, after int) StatChange {
 	}
 }
 
-func extractRepoMetadata(repo *g.Repository) (desc, lang, license, created, updated string) {
-	desc = repo.GetDescription()
-	lang = repo.GetLanguage()
+func extractRepoMetadata(repo *g.Repository) (string, string, string, string, string) {
+	desc := repo.GetDescription()
+	lang := repo.GetLanguage()
+	license := ""
 	if repo.GetLicense() != nil {
 		license = repo.GetLicense().GetName()
 	}
-	created = repo.GetCreatedAt().String()
-	updated = repo.GetUpdatedAt().String()
-	return
+	created := repo.GetCreatedAt().String()
+	updated := repo.GetUpdatedAt().String()
+	return desc, lang, license, created, updated
 }
 
 // Add adds a new Diff into the Jar if a difference in the latest update was detected.
