@@ -22,6 +22,7 @@ func (s StaticSummarizer) GenerateNotificationMessage(jar *diff.Jar, _ Config) (
 	}
 
 	var sb strings.Builder
+	wroteLine := false
 
 	for name, diff := range jar.Diffs {
 		var updates []string
@@ -34,7 +35,15 @@ func (s StaticSummarizer) GenerateNotificationMessage(jar *diff.Jar, _ Config) (
 		if diff.Forks.Diff > 0 {
 			updates = append(updates, fmt.Sprintf("%d new forks", diff.Forks.Diff))
 		}
+		if len(updates) == 0 {
+			continue
+		}
 		sb.WriteString(fmt.Sprintf("%s has %s!\n", name, strings.Join(updates, ", ")))
+		wroteLine = true
+	}
+
+	if !wroteLine {
+		return "", nil
 	}
 
 	return sb.String(), nil
