@@ -3,10 +3,11 @@ package commands
 import (
 	"context"
 	"log/slog"
-	"os"
 	"time"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/containrrr/shoutrrr/pkg/router"
+	gh "github.com/google/go-github/v74/github"
 
 	"github.com/eikendev/cheergo/internal/diff"
 	"github.com/eikendev/cheergo/internal/notify"
@@ -27,12 +28,11 @@ type RunCommand struct {
 	LLMModel    string `name:"llm-model" help:"LLM model to use." default:"google/gemini-2.5-flash" env:"CHEERGO_LLM_MODEL"`
 }
 
-// Run executes the main logic of the application.
-func (cmd *RunCommand) Run() error {
+func initRun(cmd *RunCommand) (*router.ServiceRouter, summarizer.Summarizer, *storage.Store, error) {
 	sender, err := shoutrrr.CreateSender(cmd.ShoutrrrURL)
 	if err != nil {
 		slog.Error("Failed to create sender", "error", err)
-		os.Exit(1)
+		return nil, nil, nil, err
 	}
 
 	var summarizerImpl summarizer.Summarizer
@@ -47,15 +47,62 @@ func (cmd *RunCommand) Run() error {
 	data, err := storage.Read(cmd.Storage)
 	if err != nil {
 		slog.Error("Failed to read storage", "error", err)
-		os.Exit(1)
+		return nil, nil, nil, err
 	}
 
+	return sender, summarizerImpl, data, nil
+}
+
+func fetchRepositories(user string) ([]*gh.Repository, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), repoFetchTimeout)
-	newRepos, err := repository.GetRepositories(ctx, cmd.GitHubUser)
-	cancel()
+	defer cancel()
+
+	newRepos, err := repository.GetRepositories(ctx, user)
 	if err != nil {
 		slog.Error("Failed to fetch repositories", "error", err)
-		os.Exit(1)
+		return nil, err
+	}
+
+	return newRepos, nil
+}
+
+func persistSnapshot(path string, data *storage.Store, repos []*gh.Repository) error {
+	data.UpdateRepositoriesFromSlice(repos)
+
+	if err := storage.Write(path, data); err != nil {
+		slog.Error("Failed to write storage", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+func notifyChanges(sender *router.ServiceRouter, summarizerImpl summarizer.Summarizer, jar *diff.Jar, cfg summarizer.Config) error {
+	messageText, err := summarizerImpl.GenerateNotificationMessage(jar, cfg)
+	if err != nil {
+		slog.Error("Failed to generate notification message", "error", err)
+		return err
+	}
+
+	notifier := notify.NewShoutrrrNotifier(sender)
+	if err := notifier.NotifyMessage(messageText); err != nil {
+		slog.Error("Failed to send notification", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+// Run executes the main logic of the application.
+func (cmd *RunCommand) Run() error {
+	sender, summarizerImpl, data, err := initRun(cmd)
+	if err != nil {
+		return err
+	}
+
+	newRepos, err := fetchRepositories(cmd.GitHubUser)
+	if err != nil {
+		return err
 	}
 
 	slog.Info("Fetched repositories",
@@ -66,42 +113,28 @@ func (cmd *RunCommand) Run() error {
 	jar := diff.NewJar()
 	jar.ComputeDiffs(newRepos, data.Repositories)
 
-	// Helper to persist latest repository snapshot.
-	persist := func() {
-		data.UpdateRepositoriesFromSlice(newRepos)
-
-		if err := storage.Write(cmd.Storage, data); err != nil {
-			slog.Error("Failed to write storage", "error", err)
-			os.Exit(1)
-		}
-	}
-
 	if len(jar.Diffs) == 0 {
 		// Persist even if there are no diffs in case there is no storage file yet.
-		persist()
+		if err := persistSnapshot(cmd.Storage, data, newRepos); err != nil {
+			return err
+		}
 
 		slog.Info("No repository changes detected", "diff_count", len(jar.Diffs))
 		return nil
 	}
 
-	messageText, err := summarizerImpl.GenerateNotificationMessage(jar, summarizer.Config{
+	if err := notifyChanges(sender, summarizerImpl, jar, summarizer.Config{
 		GitHubUser: cmd.GitHubUser,
 		LLMApiKey:  cmd.LLMApiKey,
 		LLMBaseURL: cmd.LLMBaseURL,
 		LLMModel:   cmd.LLMModel,
-	})
-	if err != nil {
-		slog.Error("Failed to generate notification message", "error", err)
-		os.Exit(1)
+	}); err != nil {
+		return err
 	}
 
-	notifier := notify.NewShoutrrrNotifier(sender)
-	if err := notifier.NotifyMessage(messageText); err != nil {
-		slog.Error("Failed to send notification", "error", err)
-		os.Exit(1)
+	if err := persistSnapshot(cmd.Storage, data, newRepos); err != nil {
+		return err
 	}
-
-	persist()
 
 	return nil
 }
