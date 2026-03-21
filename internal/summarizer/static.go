@@ -12,11 +12,11 @@ type StaticSummarizer struct{}
 
 // NewStaticSummarizer returns a new Summarizer that generates static messages.
 func NewStaticSummarizer() Summarizer {
-	return StaticSummarizer{}
+	return &StaticSummarizer{}
 }
 
 // GenerateNotificationMessage generates a static notification message from repository diffs.
-func (s StaticSummarizer) GenerateNotificationMessage(jar *diff.Jar, _ Config) (string, error) {
+func (s *StaticSummarizer) GenerateNotificationMessage(jar *diff.Jar, _ Config) (string, error) {
 	if len(jar.Diffs) == 0 {
 		return "", nil
 	}
