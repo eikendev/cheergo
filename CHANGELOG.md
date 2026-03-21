@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.4](https://github.com/eikendev/cheergo/compare/v0.1.3...v0.1.4) (2026-03-21)
+
+
+### Bug Fixes
+
+* **summarizer:** avoid empty repo update lines ([be994ff](https://github.com/eikendev/cheergo/commit/be994ff7a99383a3a8ea2e81eec41f69ec73e08d))
+
+
+### Build
+
+* enforce go fix check in test ([6db02a4](https://github.com/eikendev/cheergo/commit/6db02a433bd4cf985197a030274b1a86905ec4fb))
+* include docs in release archive ([98115e4](https://github.com/eikendev/cheergo/commit/98115e471c72abab1abf7ded24ac71b130c22e49))
+
 ## [0.1.3](https://github.com/eikendev/cheergo/compare/v0.1.2...v0.1.3) (2026-02-16)
 
 
