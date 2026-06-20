@@ -31,7 +31,8 @@ func GetRepositories(ctx context.Context, user string) ([]*github.Repository, er
 		}
 
 		if len(newRepos) > perPage {
-			slog.Warn("API returned unexpected number of repositories for page",
+			slog.Warn(
+				"API returned unexpected number of repositories for page",
 				"page", opt.Page,
 				"expected_max", perPage,
 				"have", len(newRepos),

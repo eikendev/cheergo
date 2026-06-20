@@ -105,7 +105,8 @@ func (cmd *RunCommand) Run() error {
 		return err
 	}
 
-	slog.Info("Fetched repositories",
+	slog.Info(
+		"Fetched repositories",
 		"user", cmd.GitHubUser,
 		"count", len(newRepos),
 	)

@@ -16,7 +16,8 @@ type CLI struct {
 
 func main() {
 	var cli CLI
-	kctx := kong.Parse(&cli,
+	kctx := kong.Parse(
+		&cli,
 		kong.Description("cheergo is a CLI tool for monitoring your GitHub repositories. It can notify you about new stars and followers."),
 		kong.UsageOnError(),
 	)
