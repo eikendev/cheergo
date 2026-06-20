@@ -66,7 +66,8 @@ func (d *Jar) Add(name string, is, was *g.Repository) {
 	subscribers := makeStatChange(was.GetSubscribersCount(), is.GetSubscribersCount())
 	forks := makeStatChange(was.GetForksCount(), is.GetForksCount())
 
-	slog.Debug("Comparing repository status",
+	slog.Debug(
+		"Comparing repository status",
 		"starDiff", stargazers.Diff,
 		"subscribersDiff", subscribers.Diff,
 		"forksDiff", forks.Diff,
@@ -74,7 +75,8 @@ func (d *Jar) Add(name string, is, was *g.Repository) {
 	)
 
 	if stargazers.Diff > 0 || subscribers.Diff > 0 || forks.Diff > 0 {
-		slog.Info("Repository change detected",
+		slog.Info(
+			"Repository change detected",
 			"repository", name,
 			"stargazers", stargazers,
 			"subscribers", subscribers,
