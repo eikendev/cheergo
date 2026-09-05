@@ -20,8 +20,8 @@ func GetRepositories(ctx context.Context, user string) ([]*github.Repository, er
 	allRepos := []*github.Repository{}
 	client := github.NewClient(nil)
 	opt := &github.RepositoryListByUserOptions{
-		Type:        "owner",
-		ListOptions: github.ListOptions{PerPage: perPage},
+		Type:    "owner",
+		PerPage: perPage,
 	}
 
 	for {
