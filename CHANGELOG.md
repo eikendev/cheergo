@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.0](https://github.com/eikendev/cheergo/compare/v0.1.4...v0.2.0) (2026-09-19)
+
+
+### Features
+
+* attest build provenance for releases ([9c237a7](https://github.com/eikendev/cheergo/commit/9c237a7a18370c8e03786b196dc7d616d21c64f8))
+
+
+### Bug Fixes
+
+* **deps:** bump go to 1.27 ([ba24aeb](https://github.com/eikendev/cheergo/commit/ba24aeb11b8fef439c6fe4d0f5c41cc1d3503604))
+* ship static amd64 and arm64 binaries ([1128380](https://github.com/eikendev/cheergo/commit/1128380b7f1b532747439ff5e4d6ca513d451478))
+
 ## [0.1.4](https://github.com/eikendev/cheergo/compare/v0.1.3...v0.1.4) (2026-03-21)
 
 
