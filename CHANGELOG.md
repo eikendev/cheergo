@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/eikendev/cheergo/compare/v0.2.0...v0.2.1) (2026-10-24)
+
+
+### Build
+
+* **actions:** bump zizmorcore/zizmor-action ([#19](https://github.com/eikendev/cheergo/issues/19)) ([18b556b](https://github.com/eikendev/cheergo/commit/18b556b5a3c4a83080387b0f61768a0ea61f0f7e))
+* **go:** bump github.com/sashabaranov/go-openai ([#17](https://github.com/eikendev/cheergo/issues/17)) ([a03e58d](https://github.com/eikendev/cheergo/commit/a03e58db0911910f30b49aedd2709a818ddf098f))
+
 ## [0.2.0](https://github.com/eikendev/cheergo/compare/v0.1.4...v0.2.0) (2026-09-19)
 
 
