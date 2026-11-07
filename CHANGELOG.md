@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.1](https://github.com/eikendev/cheergo/compare/v0.2.0...v0.2.1) (2026-11-07)
+
+
+### Build
+
+* **actions:** bump zizmorcore/zizmor-action ([#19](https://github.com/eikendev/cheergo/issues/19)) ([18b556b](https://github.com/eikendev/cheergo/commit/18b556b5a3c4a83080387b0f61768a0ea61f0f7e))
+* **actions:** bump zizmorcore/zizmor-action ([#20](https://github.com/eikendev/cheergo/issues/20)) ([a95bd3f](https://github.com/eikendev/cheergo/commit/a95bd3f623fb43eb2c6cd815b01f93e6cd288777))
+* add gohawk to lint tools ([51c395f](https://github.com/eikendev/cheergo/commit/51c395f000ffad3ca118ef46a943f313bc8e5875))
+* **go:** bump github.com/alecthomas/kong ([#21](https://github.com/eikendev/cheergo/issues/21)) ([e472c38](https://github.com/eikendev/cheergo/commit/e472c381e0a9551a9ce07ecc42000b66d2b3c9fe))
+* **go:** bump github.com/sashabaranov/go-openai ([#17](https://github.com/eikendev/cheergo/issues/17)) ([a03e58d](https://github.com/eikendev/cheergo/commit/a03e58db0911910f30b49aedd2709a818ddf098f))
+* pin lint tools in a tools module ([709ce4f](https://github.com/eikendev/cheergo/commit/709ce4fbde145ee246d30af466ff3bf20920d4e8))
+
 ## [0.2.0](https://github.com/eikendev/cheergo/compare/v0.1.4...v0.2.0) (2026-09-19)
 
 
